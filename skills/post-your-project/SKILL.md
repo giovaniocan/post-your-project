@@ -69,17 +69,34 @@ message, a sign-up): reach the screen after it another way and say how, and
 list the service's host under `block` in the capture config so a stray click
 can't get through.
 
-## 1. Locate the repository
+## 1. Locate the repository and open a branch
 
 - A local path, or "this project" → use its git root.
-- A GitHub URL or `owner/repo` → clone it shallow into the session's scratchpad
-  (or a temp dir if there is none):
-  `gh repo clone <owner/repo> <dir>/<repo> -- --depth 1`.
-  Tell the user where the clone lives: the generated files land there and
-  nothing gets pushed.
+- A GitHub URL or `owner/repo` → clone it into the session's scratchpad (or a
+  temp dir if there is none): `gh repo clone <owner/repo> <dir>/<repo>`. Tell
+  the user where the clone lives.
 - Run `git status`. If `README.md` has uncommitted changes, stop and ask —
   overwriting them would destroy work that git cannot bring back. A committed
   README can be replaced; git keeps the old one.
+
+The README goes to the user as a pull request they only have to approve, so
+put the work on its own branch before writing anything:
+
+- `git fetch origin` and find the default branch
+  (`gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`). A local
+  copy is often behind GitHub, and a branch cut from a stale one carries the
+  staleness into the PR.
+- Clean working tree: `git switch -c docs/readme origin/<default>`.
+- Uncommitted work in other files: leave it alone and use a separate worktree,
+  `git worktree add <scratchpad>/readme-worktree -b docs/readme origin/<default>`,
+  and do every later step there — install, run, write. Switching branches
+  under someone's unfinished work is how it gets lost.
+- If `docs/readme` already exists, add the date: `docs/readme-<YYYY-MM-DD>`.
+- Check that the user can push:
+  `gh repo view --json viewerPermission --jq .viewerPermission` must be
+  `ADMIN`, `MAINTAIN` or `WRITE`. If it isn't — someone else's repository —
+  say so now: the files stay local, or you can fork it if they want a PR from
+  their fork.
 
 ## 2. Build a fact sheet from the code
 
@@ -350,12 +367,38 @@ called a mock-data demo "full-featured" with "real-time analytics".
    - Is the English file English throughout, apart from code identifiers?
 3. Fix, then reread the Portuguese file for the same things.
 
-## 7. Hand back
+## 7. Open the pull request
+
+The user asked for the README to arrive as a pull request ready to approve, so
+do this without asking first — it touches nothing but the new branch:
+
+1. Stage only what the README work produced: `git add README.md
+   README.pt-BR.md docs/screenshots/`, plus `.gitignore` if you changed it.
+   Never `git add -A`: the working copy may hold the user's unrelated work, and
+   a stray `.env` must never ride along. Confirm with `git status` that nothing
+   else is staged.
+2. Commit with a Conventional Commit message in English (`docs: bilingual
+   README with screenshots`) and a body saying what was replaced and why.
+3. `git push -u origin <branch>`, then `gh pr create --base <default>` with a
+   summary — the files, the screenshots, what the old README got wrong,
+   anything already exposed in the repo (by kind, never the value) — and a
+   test plan with a box for the user to open the rendered README.
+4. Images the check script listed as no longer used are not deleted in this
+   PR. Ask; if the user agrees, remove them in a second commit on the same
+   branch.
+
+Merging is the user's call. Ask in the hand-back, and merge only on a clear
+yes, with `gh pr merge <number> --squash --delete-branch` (or `--merge` if
+the repository doesn't allow squash). Then say it is merged and link the
+README on the default branch. Without a yes, the PR stays open.
+
+## 8. Hand back
 
 Report in the user's language:
 
-- Files created or changed — and say so explicitly if `README.md` was replaced
-  or `.gitignore` was touched.
+- The PR link, and the question: may I merge it into `<default>`?
+- Files in the PR — and say so explicitly if `README.md` was replaced or
+  `.gitignore` was touched.
 - Images the check script listed as no longer used by the README: offer to
   delete them, but don't do it yourself — they may be used elsewhere (the
   repo's social preview, other docs).
@@ -369,7 +412,8 @@ Report in the user's language:
   outside service (a test that sends a real email, say), by file and kind —
   never the value itself.
 
-Don't commit or push; offer to. Then offer the LinkedIn post.
+Then offer the LinkedIn post; once the PR is merged, the post can link
+straight to the README.
 
 ---
 
