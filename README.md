@@ -2,102 +2,114 @@
 
 **English** · [Português](README.pt-BR.md)
 
-> A Claude Code plugin that gets a repository ready to show: a README in English and Brazilian Portuguese written from the actual code, screenshots of the project running, and a LinkedIn post draft.
+> A Claude Code plugin that transforms a repository into a public-ready portfolio: a bilingual README written from the actual code, real screenshots of the running project, and a LinkedIn post draft with preview.
 
 ![The README checker flagging repeated headings, an unignored .env and unsupported claims in a draft](docs/screenshots/check-readme.png)
 
 ## About
 
-Ask Claude Code to "make this repo presentable" and this skill takes over. It reads the code before writing a word, runs the project to capture real screenshots, writes both READMEs, and then checks them with scripts, because the failures that matter in a public README are easy to miss on a reread: a feature that isn't there, a command that doesn't run, a key or a phone number that should never have been published.
+This plugin reads your code before writing a word, runs your project to capture real screenshots, generates both READMEs in parallel, then verifies them with automated checks — because the failures that matter in a README published on GitHub are easy to miss on reread. The tool exists because features the code doesn't have and commands that don't run are the fastest ways to lose credibility.
 
-It started as a personal tool for portfolio projects of a Brazilian developer, which is why the second language is Portuguese.
+It started as a personal tool for a Brazilian developer's portfolio projects, which is why Portuguese is a first-class language here, not an afterthought.
 
 ## Features
 
-- **README from the code** — features, stack and commands come from manifests, routes and scripts; anything it can't trace to a file stays out.
-- **Two languages** — `README.md` in English and `README.pt-BR.md` written natively in Portuguese, with a language switcher.
-- **Real screenshots** — web apps are captured in headless Chrome while they run; CLIs, scripts and backends get the output of a real run drawn as a terminal window; mobile apps are captured from the simulator.
-- **Automated checks** — broken links and images, a License section without a LICENSE, files a command expects that aren't in the repo, a `.env` the README asks for that `.gitignore` doesn't cover, and promise words such as "production-ready" or "scalable", each with its line.
-- **Leak checks** — secrets in the text stop the build; personal data and files already exposed in the repo are reported by kind, never by value.
-- **Pull request ready to approve** — the README work goes on its own `readme` branch, with only the README files; the skill opens the PR, prepares the post, and asks one question: may I merge and publish?
-- **LinkedIn post draft** — asks which language each time, writes in your own voice from posts you provide, and opens a private preview with the "see more" fold, the character count and a copy button.
+- **README from code, not guessing** — features, stack, and commands are traced to manifests, routes, and scripts; anything that doesn't appear in code stays out
+- **Two native languages** — `README.md` in English and `README.pt-BR.md` written directly in Portuguese, each with its own voice, plus a language switcher on both
+- **Real screenshots** — web apps captured in headless Chrome as they run; CLIs and scripts rendered as terminal output from actual executions; mobile apps from the simulator
+- **Automated verification** — broken links and images, License sections without a LICENSE file, `.env` files the README requires that aren't in `.gitignore`, and unsupported claims flagged by line
+- **Leak detection** — secrets in the text block the build; personal data and already-exposed files are reported by category, never by value
+- **Pull request workflow** — README work lands on its own `readme` branch; the plugin opens the PR, prepares the post, and asks one question before proceeding
+- **LinkedIn post with preview** — generates a draft in your own voice (from posts you provide), with a private preview showing the "see more" fold, character count, and a copy button ready to go
 
 ## Screenshots
 
 | Terminal output as an image | LinkedIn post preview |
 | --- | --- |
-| ![A real run of a Python script rendered as a terminal window](docs/screenshots/terminal-example.png) | ![Preview page for an example post draft, with character count and review notes](docs/screenshots/post-preview.png) |
+| ![A real run of a command rendered as a terminal window](docs/screenshots/terminal-example.png) | ![Preview page for a post draft, with character count and review notes](docs/screenshots/post-preview.png) |
+
+## Tech stack
+
+- **Runtime:** Node.js (tested with Node 24)
+- **Browser automation:** Playwright (headless Chrome)
+- **Scripts:** JavaScript (`.mjs` modules)
+- **CLI tools:** git, GitHub CLI (`gh`)
+- **Mobile:** iOS simulator (Xcode) or Android emulator
 
 ## Getting started
 
 ### Prerequisites
 
 - [Claude Code](https://code.claude.com)
-- Node.js (tested with Node 24)
-- Google Chrome — or Playwright's Chromium, via `npx playwright install chromium`
-- git, and the GitHub CLI (`gh`) when you point it at a GitHub URL
-- For mobile screenshots, an iOS simulator (Xcode) or Android emulator
+- Node.js 20+
+- Google Chrome — or `npm install -g playwright` for Chromium
+- git and the GitHub CLI (`gh`)
+- iOS simulator (Xcode) or Android emulator for mobile screenshots
 
 Developed and tested on macOS.
 
 ### Installation
-
-In Claude Code:
 
 ```
 /plugin marketplace add giovaniocan/post-your-project
 /plugin install post-your-project@giovaniocan
 ```
 
-The skill installs its one dependency (`playwright-core`) inside its own folder the first time it takes a screenshot.
+The plugin installs its only dependency (`playwright-core`) inside its own folder the first time you ask for screenshots.
 
 ### Usage
 
-Open Claude Code in a project, or anywhere with a GitHub URL, and ask in your own words:
+Open Claude Code in a project directory or anywhere with a GitHub repository link, then ask in plain language:
 
-- "gera um README em inglês e português com prints do sistema"
-- "deixa esse repo bonito pro portfólio"
-- "escreve um post pro LinkedIn sobre esse projeto"
-- "write a README for github.com/user/repo"
+```
+gera um README em inglês e português com prints do sistema
+deixa esse repo bonito pro portfólio
+escreve um post pro LinkedIn sobre esse projeto
+write a README for this repo
+```
 
-For the LinkedIn post, the skill asks for two or three of your own posts the first time and keeps them in `~/.claude/post-your-project/voice.md`, outside the plugin, so your posts are never shared with it.
+For LinkedIn posts, the plugin asks for two or three of your own posts the first time and saves them to `~/.claude/post-your-project/voice.md`, outside the plugin, so your voice stays yours.
 
 ## How publishing works
 
-Nothing is posted without your yes for that specific post. Then the skill opens LinkedIn in your browser with the post already in the composer — bold title, paragraphs, the `Link: …` line and the tech-stack block — and copies the post's screenshots, numbered in order, into `Downloads/linkedin-posts/<project>/`, with that folder's path on your clipboard. You:
+After the plugin opens the pull request and prepares the post, you review and approve. Then:
 
-1. Close the link card (its X).
-2. Click Media. If the file window isn't already in the project's folder, press ⌘⇧G, ⌘V, Enter.
-3. Press ⌘A, Enter, then click Publish.
+1. For the README: review the PR on GitHub and merge when you're happy
+2. For the LinkedIn post: the plugin opens LinkedIn in your browser with the post already in the composer (bold title, paragraphs, the `Link: …` line and tech stack) and copies the post's images, numbered, into `Downloads/linkedin-posts/<project>/`
 
-LinkedIn's composer takes images only through the Media button — pasting or dragging one doesn't work. The browser's file window reopens where it was last used, so posting the same project again usually skips the ⌘⇧G step. On Windows the file window jumps to the folder with Ctrl+V in the file-name box; on Linux with Ctrl+L, Ctrl+V. Tested on macOS. The link that fills in the composer isn't an official LinkedIn API: if it stops working, the preview's copy button still does.
+Then you:
+1. Close the link card (its X in the LinkedIn composer)
+2. Click Media. If the file window isn't already in that folder, press ⌘⇧G, ⌘V, Enter (Windows: Ctrl+V in the file-name box, Enter; Linux: Ctrl+L, Ctrl+V, Enter), then select all images (⌘A / Ctrl+A) and confirm
+3. Press Publish
 
-A scheduler connected to Claude (Typefully, for example) also works: the skill publishes through it.
+LinkedIn's composer only accepts images through the Media button — pasting or dragging doesn't work. The browser reopens the file window where it last used it, so reposting the same project usually skips the navigation step.
 
 ## What it won't do
 
-- Invent features, commands or screenshots. When it can't run something, it says so and asks you for the capture.
-- Put secrets, IDs, personal or client data in the README, the images or the post.
-- Merge the pull request or delete files without asking. Committing the README to a new branch and opening the PR is the one thing it does on its own.
-- Publish a post without your yes for that post, or click Publish for you. It never signs in to LinkedIn or drives its pages.
+- **Invent features.** When it can't run something, it says so and asks you for a screenshot instead of guessing
+- **Leak secrets or personal data.** A README that reaches GitHub is public forever, and the plugin treats it that way
+- **Act without permission.** It commits the README to a new branch and opens a PR, but doesn't merge or publish without your explicit approval for each step
+- **Drive LinkedIn or sign in.** The plugin prepares the post in your browser and stops; you handle the final step
 
 ## Project structure
 
 ```
-.claude-plugin/          plugin and marketplace manifests
+.claude-plugin/               Plugin and marketplace manifests
 skills/post-your-project/
-  SKILL.md               the instructions Claude follows
-  references/            README template and LinkedIn writing guide
+  SKILL.md                   The detailed instructions Claude reads and follows
+  references/
+    readme-template.md       Structure and sections both READMEs use
+    linkedin-post.md         Writing rules for the post and examples
   scripts/
-    capture.mjs          screenshots of a running web app
-    terminal.mjs         a real command's output drawn as a terminal window
-    check-readme.mjs     checks both READMEs before hand-back
-    post-preview.mjs     LinkedIn preview page and text review
-    linkedin-share.mjs   opens LinkedIn with the post and the screenshots ready to attach
-    linkedin-text.mjs    bold title and share link, shared by the two above
-    leaks.mjs            secret and personal-data patterns
-    wording.mjs          promise words and stock phrases
-    browser.mjs          shared headless Chrome launcher
+    capture.mjs              Screenshots of a running web app
+    terminal.mjs             Real command output drawn as a terminal window
+    check-readme.mjs         Verifies both READMEs for links, leaks, claims
+    post-preview.mjs         Generates the LinkedIn preview and review notes
+    linkedin-share.mjs       Opens LinkedIn with the post and images ready
+    linkedin-text.mjs        Bold title and share link utilities
+    leaks.mjs                Secret and personal-data detection patterns
+    wording.mjs              Promise-word and stock-phrase detection
+    browser.mjs              Shared headless Chrome setup
 ```
 
 ## License

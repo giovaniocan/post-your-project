@@ -2,104 +2,116 @@
 
 [English](README.md) · **Português**
 
-> Um plugin do Claude Code que deixa um repositório pronto para mostrar: README em inglês e em português escrito a partir do código de verdade, prints do projeto rodando e um rascunho de post para o LinkedIn.
+> Um plugin do Claude Code que transforma um repositório em portfólio pronto pra mostrar: README bilíngue escrito a partir do código de verdade, prints reais do projeto rodando e um rascunho de post pro LinkedIn com prévia.
 
 ![O verificador de README apontando títulos repetidos, um .env fora do .gitignore e afirmações sem respaldo num rascunho](docs/screenshots/check-readme.png)
 
 ## Sobre
 
-Peça ao Claude Code para "deixar esse repo apresentável" e a skill assume. Ela lê o código antes de escrever qualquer coisa, roda o projeto para tirar prints reais, escreve os dois READMEs e depois confere tudo com scripts. Os erros que importam num README público passam fácil numa releitura: uma funcionalidade que não existe, um comando que não roda, uma chave ou um telefone que nunca deveriam ter sido publicados.
+A skill lê o código antes de escrever qualquer coisa, roda o projeto para capturar prints reais, gera os dois READMEs em paralelo e depois confere tudo com scripts. Porque os erros que importam num README publicado no GitHub passam fácil numa releitura: funcionalidade que não existe e comando que não roda são as maneiras mais rápidas de perder credibilidade.
 
-Começou como ferramenta pessoal para os projetos de portfólio de um dev brasileiro, e por isso o segundo idioma é o português.
+Começou como ferramenta pessoal de portfólio de um dev brasileiro. Por isso português é aqui uma língua de primeira classe, não um complemento.
 
 ## Funcionalidades
 
-- **README a partir do código** — funcionalidades, stack e comandos saem dos manifests, das rotas e dos scripts; o que não dá para ligar a um arquivo fica de fora.
-- **Dois idiomas** — `README.md` em inglês e `README.pt-BR.md` escrito direto em português, não traduzido, com seletor de idioma.
-- **Prints reais** — apps web são capturados no Chrome headless enquanto rodam; CLIs, scripts e backends ganham a saída de uma execução real desenhada como janela de terminal; apps mobile são capturados no simulador.
-- **Checagens automáticas** — links e imagens quebrados, seção de licença sem arquivo LICENSE, arquivos que um comando espera e não estão no repositório, um `.env` pedido pelo README que o `.gitignore` não cobre, e palavras de promessa como "production-ready" ou "scalable", cada uma com a linha.
-- **Checagem de vazamento** — segredo no texto interrompe a geração; dado pessoal e arquivo já exposto no repositório aparecem pelo tipo, nunca pelo valor.
-- **Pull request pronto para aprovar** — o README vai numa branch `readme`, só com os arquivos dele; a skill abre o PR, prepara o post e faz uma pergunta só: posso fazer o merge e publicar?
-- **Rascunho de post para o LinkedIn** — pergunta o idioma a cada vez, escreve com a sua voz a partir de posts que você fornece e abre uma prévia privada com o corte do "ver mais", a contagem de caracteres e um botão de copiar.
+- **README a partir do código, não adivinhação** — funcionalidades, stack e comandos são rastreáveis nos manifests, nas rotas e nos scripts; o que não aparece no código fica de fora
+- **Dois idiomas nativos** — `README.md` em inglês e `README.pt-BR.md` escrito direto em português, cada um com a sua voz, mais um seletor de idioma nos dois
+- **Prints reais** — apps web capturados no Chrome headless enquanto rodam; CLIs e scripts desenhados como saída de terminal de execuções de verdade; apps mobile do simulador
+- **Verificação automática** — links e imagens quebrados, seção de licença sem arquivo LICENSE, `.env` que o README pede mas não está no `.gitignore`, e afirmações sem respaldo marcadas por linha
+- **Detecção de vazamento** — segredo no texto interrompe a geração; dado pessoal e arquivo já exposto aparecem por categoria, nunca pelo valor
+- **Workflow de pull request** — README vai numa branch `readme`; a skill abre o PR, prepara o post e faz uma pergunta antes de prosseguir
+- **Post pro LinkedIn com prévia** — gera um rascunho na sua voz (a partir de posts que você fornece), com uma prévia privada mostrando o corte do "ver mais", contagem de caracteres e um botão de copiar pronto
 
 ## Telas
 
 | Saída do terminal como imagem | Prévia do post do LinkedIn |
 | --- | --- |
-| ![Uma execução real de um script Python desenhada como janela de terminal](docs/screenshots/terminal-example.png) | ![Página de prévia de um rascunho de exemplo, com contagem de caracteres e observações da revisão](docs/screenshots/post-preview.png) |
+| ![Uma execução real de um comando desenhada como janela de terminal](docs/screenshots/terminal-example.png) | ![Página de prévia de um rascunho, com contagem de caracteres e observações da revisão](docs/screenshots/post-preview.png) |
+
+## Tecnologias
+
+- **Runtime:** Node.js (testado com Node 24)
+- **Automação de browser:** Playwright (Chrome headless)
+- **Scripts:** JavaScript (módulos `.mjs`)
+- **Ferramentas CLI:** git, GitHub CLI (`gh`)
+- **Mobile:** Simulador iOS (Xcode) ou emulador Android
 
 ## Como rodar
 
 ### Pré-requisitos
 
 - [Claude Code](https://code.claude.com)
-- Node.js (testado com o Node 24)
-- Google Chrome — ou o Chromium do Playwright, com `npx playwright install chromium`
-- git, e o GitHub CLI (`gh`) quando você passar uma URL do GitHub
-- Para prints de app mobile, um simulador iOS (Xcode) ou emulador Android
+- Node.js 20+
+- Google Chrome — ou `npm install -g playwright` para Chromium
+- git e GitHub CLI (`gh`)
+- Simulador iOS (Xcode) ou emulador Android para prints de app mobile
 
 Desenvolvido e testado no macOS.
 
 ### Instalação
-
-No Claude Code:
 
 ```
 /plugin marketplace add giovaniocan/post-your-project
 /plugin install post-your-project@giovaniocan
 ```
 
-A skill instala a única dependência dela (`playwright-core`) dentro da própria pasta na primeira vez que tira um print.
+A skill instala a única dependência dela (`playwright-core`) dentro da própria pasta na primeira vez que você pede um print.
 
 ### Uso
 
-Abra o Claude Code num projeto, ou em qualquer pasta com uma URL do GitHub, e peça do seu jeito:
+Abra o Claude Code num diretório de projeto ou em qualquer pasta com link de repositório, e peça do seu jeito:
 
-- "gera um README em inglês e português com prints do sistema"
-- "deixa esse repo bonito pro portfólio"
-- "escreve um post pro LinkedIn sobre esse projeto"
-- "write a README for github.com/user/repo"
+```
+gera um README em inglês e português com prints do sistema
+deixa esse repo bonito pro portfólio
+escreve um post pro LinkedIn sobre esse projeto
+write a README for this repo
+```
 
-Para o post do LinkedIn, na primeira vez a skill pede dois ou três posts seus e guarda em `~/.claude/post-your-project/voice.md`, fora do plugin, então os seus posts nunca são compartilhados junto com ele.
+Para posts no LinkedIn, a skill pede dois ou três posts seus na primeira vez e guarda em `~/.claude/post-your-project/voice.md`, fora do plugin, então a sua voz permanece sua.
 
 ## Como a publicação funciona
 
-Nada é postado sem o seu "sim" para aquele post. Depois do sim, a skill abre o LinkedIn no seu navegador com o post já na caixa de publicação — título em negrito, parágrafos, a linha `Link: …` e o bloco de stack — e copia os prints do post, numerados na ordem, para `Downloads/linkedin-posts/<projeto>/`, deixando o caminho dessa pasta na área de transferência. Você:
+Depois que a skill abre o PR e prepara o post, você revisa e aprova. Então:
 
-1. Fecha o cartão do link (o X).
-2. Clica em Mídia. Se a janela de arquivos ainda não estiver na pasta do projeto, aperta ⌘⇧G, ⌘V, Enter.
-3. Aperta ⌘A, Enter e clica em Publicar.
+1. Para o README: revise o PR no GitHub e faça merge quando estiver satisfeito
+2. Para o post do LinkedIn: a skill abre o LinkedIn no seu navegador com o post já na caixa de publicação (título em negrito, parágrafos, a linha `Link: …` e tech stack) e copia as imagens do post, numeradas, para `Downloads/linkedin-posts/<projeto>/`
 
-A caixa de post do LinkedIn só aceita imagem pelo botão Mídia — colar ou arrastar não funciona. A janela de arquivos do navegador reabre onde foi usada pela última vez, então no próximo post do mesmo projeto o ⌘⇧G costuma nem ser preciso. No Windows a janela vai para a pasta com Ctrl+V no campo do nome do arquivo; no Linux, com Ctrl+L, Ctrl+V. Testado no macOS. O link que preenche a caixa do post não é uma API oficial do LinkedIn: se parar de funcionar, o botão de copiar da prévia continua funcionando.
+Depois você:
+1. Fecha o cartão do link (o X na caixa do post)
+2. Clica em Mídia. Se a janela de arquivos ainda não estiver nessa pasta, aperta ⌘⇧G, ⌘V, Enter (Windows: Ctrl+V no campo do nome do arquivo, Enter; Linux: Ctrl+L, Ctrl+V, Enter), depois seleciona todas as imagens (⌘A / Ctrl+A) e confirma
+3. Clica em Publicar
 
-Um agendador conectado ao Claude (a Typefully, por exemplo) também serve: a skill publica por ele.
+A caixa de post do LinkedIn só aceita imagem pelo botão Mídia — colar ou arrastar não funciona. O navegador reabre a janela de arquivos onde foi usada pela última vez, então repostar o mesmo projeto costuma pular a etapa de navegação.
 
 ## O que ela não faz
 
-- Inventar funcionalidade, comando ou print. Quando não consegue rodar algo, ela avisa e pede o print para você.
-- Colocar segredo, ID, dado pessoal ou de cliente no README, nas imagens ou no post.
-- Fazer merge do PR ou apagar arquivo sem perguntar. Fazer o commit do README numa branch nova e abrir o PR é a única coisa que ela faz por conta própria.
-- Publicar um post sem o seu "sim" para aquele post, ou clicar em Publicar por você. Ela nunca entra no LinkedIn nem controla as páginas dele.
+- **Inventar funcionalidade.** Quando não consegue rodar algo, ela avisa e pede um print em vez de adivinhar
+- **Vazar segredo ou dado pessoal.** Um README que chega ao GitHub é público para sempre, e a skill trata assim
+- **Agir sem permissão.** Ela faz commit do README numa branch nova e abre um PR, mas não faz merge nem publica sem o seu "sim" explícito para cada passo
+- **Controlar o LinkedIn ou entrar nele.** A skill prepara o post no seu navegador e para; você cuida do último passo
 
 ## Estrutura do projeto
 
 ```
-.claude-plugin/          manifests do plugin e do marketplace
+.claude-plugin/               Manifests do plugin e do marketplace
 skills/post-your-project/
-  SKILL.md               as instruções que o Claude segue
-  references/            modelo de README e guia de escrita do LinkedIn
+  SKILL.md                   As instruções detalhadas que o Claude lê e segue
+  references/
+    readme-template.md       Estrutura e seções que os dois READMEs usam
+    linkedin-post.md         Regras de escrita do post e exemplos
   scripts/
-    capture.mjs          prints de um app web rodando
-    terminal.mjs         a saída de um comando real desenhada como terminal
-    check-readme.mjs     confere os dois READMEs antes da entrega
-    post-preview.mjs     página de prévia do LinkedIn e revisão do texto
-    linkedin-share.mjs   abre o LinkedIn com o post e os prints prontos para anexar
-    linkedin-text.mjs    título em negrito e link de compartilhamento, usados pelos dois acima
-    leaks.mjs            padrões de segredo e de dado pessoal
-    wording.mjs          palavras de promessa e frases prontas
-    browser.mjs          inicialização compartilhada do Chrome headless
+    capture.mjs              Prints de um app web rodando
+    terminal.mjs             Saída real de comando desenhada como terminal
+    check-readme.mjs         Verifica os dois READMEs para links, vazamentos, afirmações
+    post-preview.mjs         Gera a prévia do LinkedIn e observações de revisão
+    linkedin-share.mjs       Abre o LinkedIn com o post e as imagens prontas
+    linkedin-text.mjs        Utilidades de título em negrito e link
+    leaks.mjs                Detecção de segredo e padrões de dado pessoal
+    wording.mjs              Detecção de palavras-promessa e frases prontas
+    browser.mjs              Setup compartilhado do Chrome headless
 ```
 
 ## Licença
 
-Distribuído sob a licença MIT. Veja [LICENSE](LICENSE).
+Distribuída sob a licença MIT. Veja [LICENSE](LICENSE).
