@@ -86,17 +86,25 @@ put the work on its own branch before writing anything:
   (`gh repo view --json defaultBranchRef --jq .defaultBranchRef.name`). A local
   copy is often behind GitHub, and a branch cut from a stale one carries the
   staleness into the PR.
-- Clean working tree: `git switch -c docs/readme origin/<default>`.
+- Clean working tree: `git switch -c readme origin/<default>`.
 - Uncommitted work in other files: leave it alone and use a separate worktree,
-  `git worktree add <scratchpad>/readme-worktree -b docs/readme origin/<default>`,
+  `git worktree add <scratchpad>/readme-worktree -b readme origin/<default>`,
   and do every later step there — install, run, write. Switching branches
   under someone's unfinished work is how it gets lost.
-- If `docs/readme` already exists, add the date: `docs/readme-<YYYY-MM-DD>`.
+- If `readme` already exists, add the date: `readme-<YYYY-MM-DD>`.
 - Check that the user can push:
   `gh repo view --json viewerPermission --jq .viewerPermission` must be
   `ADMIN`, `MAINTAIN` or `WRITE`. If it isn't — someone else's repository —
   say so now: the files stay local, or you can fork it if they want a PR from
   their fork.
+
+Unless the user asked for the README only, a LinkedIn post comes right after
+it, so ask now, in one message, what the post will need: its language
+(Portuguese, English or both) and — only if the code and README can't answer
+them — whether there is a real result number and whether the project is live.
+Asking up front lets the rest run without stopping until the PR and the post
+preview are both ready; stop again only if something blocks you (credentials,
+a run that fails).
 
 ## 2. Build a fact sheet from the code
 
@@ -387,16 +395,26 @@ do this without asking first — it touches nothing but the new branch:
    PR. Ask; if the user agrees, remove them in a second commit on the same
    branch.
 
-Merging is the user's call. Ask in the hand-back, and merge only on a clear
-yes, with `gh pr merge <number> --squash --delete-branch` (or `--merge` if
-the repository doesn't allow squash). Then say it is merged and link the
-README on the default branch. Without a yes, the PR stays open.
+Merging is the user's call, and so is publishing: don't ask yet. Build the
+LinkedIn post and its preview first (the "LinkedIn post" section below), so
+the hand-back can ask both in one question.
 
 ## 8. Hand back
 
-Report in the user's language:
+Report in the user's language, and end with one question:
+**"Posso fazer o merge na `<default>` e publicar o post?"** (in English for an
+English-speaking user). Then:
 
-- The PR link, and the question: may I merge it into `<default>`?
+- **Yes to both** — merge first, with `gh pr merge <number> --squash
+  --delete-branch` (or `--merge` if the repository doesn't allow squash), so
+  the link in the post opens the new README; then publish as in step 9 of the
+  LinkedIn section.
+- **Yes to one** — do only that one.
+- **No, or no answer** — the PR stays open and nothing is posted.
+
+The report:
+
+- The PR link and the post preview link.
 - Files in the PR — and say so explicitly if `README.md` was replaced or
   `.gitignore` was touched.
 - Images the check script listed as no longer used by the README: offer to
@@ -412,8 +430,8 @@ Report in the user's language:
   outside service (a test that sends a real email, say), by file and kind —
   never the value itself.
 
-Then offer the LinkedIn post; once the PR is merged, the post can link
-straight to the README.
+When the user asked for the README only, end with "Posso fazer o merge?" and
+offer the post afterwards.
 
 ---
 
@@ -428,9 +446,10 @@ line as the README: nothing the code doesn't back.
    so check its claims against the code like any other. Ask the author at most
    two questions, and only what the code and README can't answer: is there a
    real result number, and is the project live and in use?
-2. **Ask which language**, every time: Portuguese, English, or both. Both means
-   two separate texts, each written natively — not one post in two languages,
-   and not a translation of the other.
+2. **Language** — the answer to the up-front question in step 1; when the post
+   is asked for on its own, ask it now: Portuguese, English, or both. Both
+   means two separate texts, each written natively — not one post in two
+   languages, and not a translation of the other.
 3. **Read the author's voice, then the rules.** The voice lives outside the
    skill, in `~/.claude/post-your-project/voice.md`, so nobody's posts ship with
    it. If that file doesn't exist, ask the user for two or three of their own
@@ -460,5 +479,22 @@ line as the README: nothing the code doesn't back.
    locally.
 8. **Hand back** the preview link, which language(s), what the review flagged
    and what you did about it — in the order and with the extras the voice asks
-   for, when it does (title options, first comment, media, points to confirm). Never post to LinkedIn, and don't offer to: the
-   user copies the text and posts it themselves.
+   for, when it does (title options, first comment, media, points to confirm).
+   After a README this is part of the README's hand-back, with its single
+   question; on its own, end with "Posso publicar o post?".
+9. **Publish — only after a yes for this post.** The yes covers the text and
+   images the preview shows; change anything afterwards and ask again. A post
+   is public the moment it goes out, and deleting it later doesn't reach the
+   people who already saw it.
+   - If a social-media scheduler with LinkedIn is connected to this session —
+     Typefully's connector is one: upload each image with its media upload,
+     then create the post for the LinkedIn account with `publish_at: "now"` —
+     use it. First check that the LinkedIn account it lists is the user's.
+   - Publish exactly what the preview shows, bold title included, images in
+     the preview's order.
+   - Then give the user the link the tool returns. If the tool can't add the
+     first comment, hand the user its text to paste under the post.
+   - With no such connector, say so and point to the preview's copy button;
+     offer to set one up.
+   - Never sign in to LinkedIn in a browser or drive its pages: LinkedIn's
+     terms forbid automated posting, and the account is what gets restricted.

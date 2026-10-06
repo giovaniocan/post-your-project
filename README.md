@@ -19,7 +19,7 @@ It started as a personal tool for portfolio projects of a Brazilian developer, w
 - **Real screenshots** — web apps are captured in headless Chrome while they run; CLIs, scripts and backends get the output of a real run drawn as a terminal window; mobile apps are captured from the simulator.
 - **Automated checks** — broken links and images, a License section without a LICENSE, files a command expects that aren't in the repo, a `.env` the README asks for that `.gitignore` doesn't cover, and promise words such as "production-ready" or "scalable", each with its line.
 - **Leak checks** — secrets in the text stop the build; personal data and files already exposed in the repo are reported by kind, never by value.
-- **Pull request ready to approve** — the README work goes on its own branch, with only the README files, and the skill opens the PR and asks before merging it.
+- **Pull request ready to approve** — the README work goes on its own `readme` branch, with only the README files; the skill opens the PR, prepares the post, and asks one question: may I merge and publish?
 - **LinkedIn post draft** — asks which language each time, writes in your own voice from posts you provide, and opens a private preview with the "see more" fold, the character count and a copy button.
 
 ## Screenshots
@@ -67,7 +67,7 @@ For the LinkedIn post, the skill asks for two or three of your own posts the fir
 - Invent features, commands or screenshots. When it can't run something, it says so and asks you for the capture.
 - Put secrets, IDs, personal or client data in the README, the images or the post.
 - Merge the pull request or delete files without asking. Committing the README to a new branch and opening the PR is the one thing it does on its own.
-- Post to LinkedIn. You copy the text from the preview and post it yourself.
+- Publish a post without your yes for that post. With a scheduler connected to Claude (Typefully, for example) it publishes through it; without one, you copy the text from the preview. It never drives LinkedIn in a browser.
 
 ## Project structure
 

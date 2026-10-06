@@ -19,7 +19,7 @@ Começou como ferramenta pessoal para os projetos de portfólio de um dev brasil
 - **Prints reais** — apps web são capturados no Chrome headless enquanto rodam; CLIs, scripts e backends ganham a saída de uma execução real desenhada como janela de terminal; apps mobile são capturados no simulador.
 - **Checagens automáticas** — links e imagens quebrados, seção de licença sem arquivo LICENSE, arquivos que um comando espera e não estão no repositório, um `.env` pedido pelo README que o `.gitignore` não cobre, e palavras de promessa como "production-ready" ou "scalable", cada uma com a linha.
 - **Checagem de vazamento** — segredo no texto interrompe a geração; dado pessoal e arquivo já exposto no repositório aparecem pelo tipo, nunca pelo valor.
-- **Pull request pronto para aprovar** — o README vai numa branch própria, só com os arquivos dele, e a skill abre o PR e pergunta antes de fazer o merge.
+- **Pull request pronto para aprovar** — o README vai numa branch `readme`, só com os arquivos dele; a skill abre o PR, prepara o post e faz uma pergunta só: posso fazer o merge e publicar?
 - **Rascunho de post para o LinkedIn** — pergunta o idioma a cada vez, escreve com a sua voz a partir de posts que você fornece e abre uma prévia privada com o corte do "ver mais", a contagem de caracteres e um botão de copiar.
 
 ## Telas
@@ -67,7 +67,7 @@ Para o post do LinkedIn, na primeira vez a skill pede dois ou três posts seus e
 - Inventar funcionalidade, comando ou print. Quando não consegue rodar algo, ela avisa e pede o print para você.
 - Colocar segredo, ID, dado pessoal ou de cliente no README, nas imagens ou no post.
 - Fazer merge do PR ou apagar arquivo sem perguntar. Fazer o commit do README numa branch nova e abrir o PR é a única coisa que ela faz por conta própria.
-- Postar no LinkedIn. Você copia o texto da prévia e posta.
+- Publicar um post sem o seu "sim" para aquele post. Com um agendador conectado ao Claude (a Typefully, por exemplo), ela publica por ele; sem isso, você copia o texto da prévia. Ela nunca controla o LinkedIn pelo navegador.
 
 ## Estrutura do projeto
 
