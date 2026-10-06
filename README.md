@@ -79,7 +79,7 @@ After the plugin opens the pull request and prepares the post, you review and ap
 
 Then you:
 1. Close the link card (its X in the LinkedIn composer)
-2. Click Media, navigate to the folder (or Ctrl/Cmd+V if it opens elsewhere), select all images
+2. Click Media. If the file window isn't already in that folder, press ⌘⇧G, ⌘V, Enter (Windows: Ctrl+V in the file-name box, Enter; Linux: Ctrl+L, Ctrl+V, Enter), then select all images (⌘A / Ctrl+A) and confirm
 3. Press Publish
 
 LinkedIn's composer only accepts images through the Media button — pasting or dragging doesn't work. The browser reopens the file window where it last used it, so reposting the same project usually skips the navigation step.

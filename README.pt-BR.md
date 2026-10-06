@@ -79,7 +79,7 @@ Depois que a skill abre o PR e prepara o post, você revisa e aprova. Então:
 
 Depois você:
 1. Fecha o cartão do link (o X na caixa do post)
-2. Clica em Mídia, navega para a pasta (ou Ctrl/Cmd+V se ela abrir em outro lugar), seleciona todas as imagens
+2. Clica em Mídia. Se a janela de arquivos ainda não estiver nessa pasta, aperta ⌘⇧G, ⌘V, Enter (Windows: Ctrl+V no campo do nome do arquivo, Enter; Linux: Ctrl+L, Ctrl+V, Enter), depois seleciona todas as imagens (⌘A / Ctrl+A) e confirma
 3. Clica em Publicar
 
 A caixa de post do LinkedIn só aceita imagem pelo botão Mídia — colar ou arrastar não funciona. O navegador reabre a janela de arquivos onde foi usada pela última vez, então repostar o mesmo projeto costuma pular a etapa de navegação.
