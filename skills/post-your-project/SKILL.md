@@ -470,9 +470,10 @@ line as the README: nothing the code doesn't back.
    them — write the title in plain text, the script makes it bold) and run
    `node <skill-dir>/scripts/post-preview.mjs post.json preview.html`.
    It prints review notes — stock phrases, markdown, promise words, length,
-   hashtags, emoji, personal data. Fix each one, or keep it only
-   when you can say why (a "complete history" that is literally the complete
-   history), and rebuild. A secret in the text or the first comment stops the
+   hashtags, emoji, personal data, Portuguese words missing their accent. Fix
+   each one and rebuild. Only a promise word may stay, when you can say why (a
+   "complete history" that is literally the complete history); markdown and a
+   missing accent are always fixed — LinkedIn would show them as they are. A secret in the text or the first comment stops the
    build: take it out, per "Nothing private goes public".
 7. **Publish the preview** with the Artifact tool (it is private until the user
    shares it): `file_path` the preview, `icon` "post", and a one-sentence

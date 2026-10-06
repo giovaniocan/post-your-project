@@ -10,7 +10,7 @@
       "name": "post-your-project",
       "source": "./",
       "description": "Bilingual README (EN + PT-BR) grounded in the code, real screenshots, and a LinkedIn post draft.",
-      "version": "1.3.0"
+      "version": "1.3.1"
     }
   ]
 }

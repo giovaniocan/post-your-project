@@ -49,6 +49,9 @@ const HASHTAG = /#[\p{L}\p{N}_]+/gu;
 const URL_PATTERN = /https?:\/\/[^\s<]+/g;
 const MARKDOWN = /\*\*[^*\n]+\*\*|__[^_\n]+__|^#{1,6}\s|`[^`\n]+`|\[[^\]\n]+\]\([^)\n]+\)/m;
 const MATH_ALPHANUMERICS = /[\u{1D400}-\u{1D7FF}]/u;
+// Portuguese words that always carry an accent. In a test run a title went
+// out as "nao", "codigo" and "adivinhacao", and nothing flagged it.
+const MISSING_ACCENT = /\b(?:nao|voce|voces|codigo|codigos|tambem|entao|ja|ate|\p{L}+(?:cao|coes|sao|soes))\b/giu;
 const STACK_LINE = /^\s*🧰/mu;
 const EMOJI = /\p{Extended_Pictographic}/gu;
 
@@ -148,6 +151,9 @@ function lint(post, { limits, boldTitle }) {
     notes.push(boldTitle
       ? 'letras em negrito Unicode no texto — escreva tudo em texto normal; o script converte o título'
       : 'letras "negrito" ou "itálico" em Unicode — leitor de tela e busca não conseguem ler');
+  }
+  if (post.lang.toLowerCase().startsWith('pt')) {
+    for (const word of new Set(matchesOf(post.text, MISSING_ACCENT))) notes.push(`"${word}" sem acento — corrija antes de publicar`);
   }
   const maxHashtags = limits.maxHashtags ?? MAX_HASHTAGS;
   const hashtags = matchesOf(post.text, HASHTAG);

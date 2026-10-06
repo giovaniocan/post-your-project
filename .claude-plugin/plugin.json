@@ -1,6 +1,6 @@
 {
   "name": "post-your-project",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Present a software project: a bilingual README (English + Brazilian Portuguese) grounded in the code, real screenshots of the running app or its terminal output, and a LinkedIn post draft with a preview to copy from.",
   "author": {
     "name": "Giovani Ocan",
