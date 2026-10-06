@@ -66,17 +66,16 @@ Para o post do LinkedIn, na primeira vez a skill pede dois ou três posts seus e
 
 Nada é postado sem o seu "sim" para aquele post. Quando você diz sim, e não há agendador conectado, a skill:
 
-1. Abre o LinkedIn no seu navegador com o post já na caixa de publicação — título em negrito, parágrafos e bloco de stack incluídos.
+1. Abre o LinkedIn no seu navegador com o post já na caixa de publicação — título em negrito, parágrafos, a linha `Link: …` para o repositório e o bloco de stack incluídos.
 2. Abre o Finder (o Explorer no Windows, o gerenciador de arquivos no Linux) com o print selecionado, pronto para arrastar para o post.
-3. Deixa o primeiro comentário (`Link: …`) copiado na área de transferência.
 
-Você arrasta a imagem, clica em Publicar e cola o comentário no post.
+Você arrasta a imagem e clica em Publicar. O link vai no próprio post, então não há comentário para colar; se a sua voz pedir o link num primeiro comentário, a skill também deixa esse comentário copiado.
 
 | | macOS | Windows | Linux |
 | --- | --- | --- | --- |
 | Abrir o LinkedIn | `open` | `rundll32` | `xdg-open` |
 | Mostrar o print | Finder, selecionado | Explorer, selecionado | a pasta dele |
-| Copiar o comentário | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` ou `xsel` |
+| Copiar um primeiro comentário, se houver | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` ou `xsel` |
 
 Testado no macOS. No Windows e no Linux, o que não puder rodar aparece na tela para você fazer à mão. O link que preenche a caixa do post não é uma API oficial do LinkedIn: se parar de funcionar, o botão de copiar da prévia continua funcionando. Com um agendador conectado ao Claude (a Typefully, por exemplo), a skill publica por ele, já com a imagem.
 

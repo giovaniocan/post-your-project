@@ -66,17 +66,16 @@ For the LinkedIn post, the skill asks for two or three of your own posts the fir
 
 Nothing is posted without your yes for that specific post. When you say yes, and no scheduler is connected, the skill:
 
-1. Opens LinkedIn in your browser with the post already in the composer — bold title, paragraphs and tech-stack block included.
+1. Opens LinkedIn in your browser with the post already in the composer — bold title, paragraphs, the `Link: …` line to the repo and the tech-stack block included.
 2. Opens Finder (Explorer on Windows, the file manager on Linux) with the screenshot selected, ready to drag into the post.
-3. Puts the first comment (`Link: …`) on your clipboard.
 
-You drag the image in, click Publish, and paste the comment under the post.
+You drag the image in and click Publish. The link goes in the post itself, so there's no comment to paste; if your voice asks for it in a first comment instead, the skill also puts that comment on your clipboard.
 
 | | macOS | Windows | Linux |
 | --- | --- | --- | --- |
 | Open LinkedIn | `open` | `rundll32` | `xdg-open` |
 | Show the screenshot | Finder, selected | Explorer, selected | its folder |
-| Copy the comment | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` or `xsel` |
+| Copy a first comment, if any | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` or `xsel` |
 
 Tested on macOS. On Windows and Linux, anything that can't run is printed for you to do by hand. The link that fills in the composer isn't an official LinkedIn API: if it stops working, the preview's copy button still does. With a scheduler connected to Claude (Typefully, for example), the skill publishes through it instead, image included.
 

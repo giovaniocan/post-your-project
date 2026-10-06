@@ -135,7 +135,9 @@ function main() {
     say(`dry run on ${process.platform}: ${[...post.text].length} characters, link ${url.length} characters`);
     say(`would open: ${commands.open.map(([program]) => program).join(' or ')}`);
     say(`would reveal: ${target.file ?? 'no image'} (${post.images.length} image(s))`);
-    say(`would copy the first comment with: ${commands.copy.map(([program]) => program).join(' or ') || 'nothing'}`);
+    say(post.comment
+      ? `would copy the first comment with: ${commands.copy.map(([program]) => program).join(' or ')}`
+      : 'no first comment — the link is in the body, nothing to copy');
     return;
   }
 

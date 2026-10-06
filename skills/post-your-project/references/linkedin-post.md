@@ -39,8 +39,8 @@ interesting, and click through if they want more.
   bullets; markdown doesn't.
 - **One thing learned or one decision worth explaining**, specific to this
   project. This is what makes a developer reader stay.
-- **Close** — where to find it ("link no primeiro comentário" / "link in the
-  first comment"), and a question only if the author would really ask it.
+- **Close** — an invitation (a question only if the author would really ask
+  it), then the repo link on its own line: `Link: <url>`.
 - **Hashtags** — three to five at the end, naming the stack and the topic
   specifically rather than generic ones about technology or innovation.
 - Length: usually 700 to 1,300 characters; never over 3,000.
@@ -53,7 +53,11 @@ interesting, and click through if they want more.
   the author's voice asks for a bold title anyway, keep it to the title, write
   it in plain text and set `boldTitle` — the preview script converts it.
 - Emoji only as the author's samples use them.
-- The repo link goes in the first comment, and the post says it is there.
+- The repo link goes in the body, on its own line after the close and before
+  any tech-stack block. Studies of LinkedIn reach measure about 19–27% less
+  for posts with a link in the body; it saves the reader a step, and a link in
+  the first comment is losing its advantage as LinkedIn spots the pattern. If
+  the author prefers the first comment anyway, their voice says so.
 
 ## Two languages
 

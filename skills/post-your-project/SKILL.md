@@ -460,15 +460,17 @@ line as the README: nothing the code doesn't back.
    example posts belong to those posts: never carry one into a new post.
 4. **Pick the images**: one to three from `docs/screenshots/`, hero first. If
    the project has none yet, capture them as in step 3.
-5. **Write** each text to its own file in the scratchpad, and a first comment
-   with the repo link (the text says where the link is).
+5. **Write** each text to its own file in the scratchpad. The repo link goes in
+   the body, on its own line after the closing invitation (`Link: <url>`):
+   one step less for the reader and for the author. Use a first comment
+   (`firstComment` in `post.json`) only when the author's voice asks for one.
 6. **Build the preview**: write a `post.json` next to the texts (format at the
    top of the script; `author` is the user's name from `git config user.name`;
    `boldTitle`, `limits` and each post's `titleOptions` when the voice asks for
    them — write the title in plain text, the script makes it bold) and run
    `node <skill-dir>/scripts/post-preview.mjs post.json preview.html`.
    It prints review notes — stock phrases, markdown, promise words, length,
-   hashtags, a link in the body, personal data. Fix each one, or keep it only
+   hashtags, emoji, personal data. Fix each one, or keep it only
    when you can say why (a "complete history" that is literally the complete
    history), and rebuild. A secret in the text or the first comment stops the
    build: take it out, per "Nothing private goes public".
@@ -492,15 +494,16 @@ line as the README: nothing the code doesn't back.
      use it. First check that the LinkedIn account it lists is the user's.
    - Publish exactly what the preview shows, bold title included, images in
      the preview's order.
-   - Then give the user the link the tool returns. If the tool can't add the
-     first comment, hand the user its text to paste under the post.
+   - Then give the user the link the tool returns. If the post has a first
+     comment the tool can't add, hand the user its text to paste under it.
    - With no such connector — the usual case — run
      `node <skill-dir>/scripts/linkedin-share.mjs post.json` (add
      `--lang <lang>` when there are two posts). It opens LinkedIn's composer
      with the text filled in, shows the screenshot in Finder (Explorer, or the
-     file manager on Linux) to drag into the post, and puts the first comment
-     on the clipboard. Tell the user the three things left to them: drag the
-     image in, click Publish, paste the comment under the post. The script
+     file manager on Linux) to drag into the post, and — only when the post
+     has a first comment — puts it on the clipboard. Tell the user what is
+     left to them: drag the image in and click Publish (and paste the comment,
+     when there is one). The script
      prints whatever it couldn't do on this system; pass that on. Pasting an
      image into the composer doesn't work, so don't suggest it.
    - Never sign in to LinkedIn in a browser or drive its pages: LinkedIn's

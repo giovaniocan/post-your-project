@@ -47,7 +47,6 @@ const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
 
 const HASHTAG = /#[\p{L}\p{N}_]+/gu;
 const URL_PATTERN = /https?:\/\/[^\s<]+/g;
-const HAS_URL = /https?:\/\//;
 const MARKDOWN = /\*\*[^*\n]+\*\*|__[^_\n]+__|^#{1,6}\s|`[^`\n]+`|\[[^\]\n]+\]\([^)\n]+\)/m;
 const MATH_ALPHANUMERICS = /[\u{1D400}-\u{1D7FF}]/u;
 const STACK_LINE = /^\s*🧰/mu;
@@ -159,7 +158,6 @@ function lint(post, { limits, boldTitle }) {
   }
   for (const cliche of new Set(matchesOf(post.text, CLICHES))) notes.push(`frase pronta "${cliche}" — diga a coisa concreta no lugar`);
   for (const word of new Set(matchesOf(post.text, PROMISE_WORDS))) notes.push(`"${word}" — sustente com o README ou tire`);
-  if (HAS_URL.test(post.text)) notes.push('link no corpo do post — posts com link externo costumam alcançar menos gente; o lugar de costume é o primeiro comentário');
   // Kind and line only, never the value: see leaks.mjs.
   for (const leak of findLeaks(post.text).filter(({ secret }) => !secret)) {
     notes.push(`linha ${leak.number}: ${leak.kind} — dado pessoal só entra se o autor pediu`);
