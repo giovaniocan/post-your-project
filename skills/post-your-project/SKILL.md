@@ -494,7 +494,14 @@ line as the README: nothing the code doesn't back.
      the preview's order.
    - Then give the user the link the tool returns. If the tool can't add the
      first comment, hand the user its text to paste under the post.
-   - With no such connector, say so and point to the preview's copy button;
-     offer to set one up.
+   - With no such connector — the usual case — run
+     `node <skill-dir>/scripts/linkedin-share.mjs post.json` (add
+     `--lang <lang>` when there are two posts). It opens LinkedIn's composer
+     with the text filled in, shows the screenshot in Finder (Explorer, or the
+     file manager on Linux) to drag into the post, and puts the first comment
+     on the clipboard. Tell the user the three things left to them: drag the
+     image in, click Publish, paste the comment under the post. The script
+     prints whatever it couldn't do on this system; pass that on. Pasting an
+     image into the composer doesn't work, so don't suggest it.
    - Never sign in to LinkedIn in a browser or drive its pages: LinkedIn's
      terms forbid automated posting, and the account is what gets restricted.

@@ -30,6 +30,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { findLeaks } from './leaks.mjs';
+import { shareUrl, withBoldTitle } from './linkedin-text.mjs';
 import { CLICHES, PROMISE_WORDS, matchesOf } from './wording.mjs';
 
 const PREFIX = 'post-preview';
@@ -51,25 +52,6 @@ const MARKDOWN = /\*\*[^*\n]+\*\*|__[^_\n]+__|^#{1,6}\s|`[^`\n]+`|\[[^\]\n]+\]\(
 const MATH_ALPHANUMERICS = /[\u{1D400}-\u{1D7FF}]/u;
 const STACK_LINE = /^\s*🧰/mu;
 const EMOJI = /\p{Extended_Pictographic}/gu;
-
-// Mathematical Sans-Serif Bold: the "bold" LinkedIn readers see. Accented
-// letters have no bold form, so they are split (NFD), the base letter is
-// converted and the accent is put back on it.
-function toUnicodeBold(text) {
-  const bold = [...text.normalize('NFD')].map((character) => {
-    const code = character.codePointAt(0);
-    if (character >= 'A' && character <= 'Z') return String.fromCodePoint(0x1d5d4 + code - 65);
-    if (character >= 'a' && character <= 'z') return String.fromCodePoint(0x1d5ee + code - 97);
-    if (character >= '0' && character <= '9') return String.fromCodePoint(0x1d7ec + code - 48);
-    return character;
-  });
-  return bold.join('').normalize('NFC');
-}
-
-function withBoldTitle(text) {
-  const [title, ...rest] = text.split('\n');
-  return [toUnicodeBold(title), ...rest].join('\n');
-}
 
 function bodyOf(text) {
   const match = text.match(STACK_LINE);
@@ -129,20 +111,24 @@ function characterCount(text) {
 }
 
 function foldIndex(text) {
+  // Counted in characters, not string offsets: each bold title letter is two
+  // UTF-16 units, and counting units put the fold far too early.
   let lineBreaks = 0;
+  let characters = 0;
   let index = 0;
   for (const character of text) {
-    if (index >= FOLD_CHARACTERS) break;
+    if (characters >= FOLD_CHARACTERS) break;
     if (character === '\n') {
       lineBreaks += 1;
       if (lineBreaks >= FOLD_LINES) break;
     }
+    characters += 1;
     index += character.length;
   }
   if (index >= text.length) return text.length;
   // Cut at a word boundary, as the feed does.
   const space = text.lastIndexOf(' ', index);
-  return space > FOLD_CHARACTERS / 2 ? space : index;
+  return space > index / 2 ? space : index;
 }
 
 function lint(post, { limits, boldTitle }) {
@@ -233,6 +219,8 @@ function panelHtml(post, index, context) {
       </article>
       <aside class="side">
         <button type="button" class="copy primary" data-copy="post-${index}" id="copy-post-${index}">Copiar texto</button>
+        <a class="copy open" href="${escapeHtml(shareUrl(post.text))}" target="_blank" rel="noopener" id="open-post-${index}">Abrir no LinkedIn</a>
+        <p class="hint">Abre a caixa de post já com o texto. A imagem você anexa pelo botão de foto do LinkedIn.</p>
         <dl class="stats">
           <div><dt>Caracteres</dt><dd><span class="${length > CHARACTER_LIMIT ? 'over' : ''}">${formatNumber(length)}</span> / ${formatNumber(CHARACTER_LIMIT)}</dd></div>
           <div><dt>Corpo sem a stack</dt><dd>${formatNumber(bodyLength)}</dd></div>
@@ -337,8 +325,10 @@ function pageHtml(context) {
   .notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--warn); font-size: 14px; }
   .clean { margin: 0; color: var(--ok); font-size: 14px; }
   .options { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
-  button.copy { font: 500 14px var(--ui); border-radius: 6px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); justify-self: start; }
+  .copy { font: 500 14px var(--ui); border-radius: 6px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); justify-self: start; }
   button.copy.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); justify-self: stretch; }
+  a.copy.open { justify-self: stretch; text-align: center; text-decoration: none; margin-top: -8px; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .extra { display: grid; gap: 8px; max-width: 555px; }
   .hint { margin: 0; color: var(--muted); font-size: 14px; }

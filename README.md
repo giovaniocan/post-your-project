@@ -62,12 +62,30 @@ Open Claude Code in a project, or anywhere with a GitHub URL, and ask in your ow
 
 For the LinkedIn post, the skill asks for two or three of your own posts the first time and keeps them in `~/.claude/post-your-project/voice.md`, outside the plugin, so your posts are never shared with it.
 
+## How publishing works
+
+Nothing is posted without your yes for that specific post. When you say yes, and no scheduler is connected, the skill:
+
+1. Opens LinkedIn in your browser with the post already in the composer — bold title, paragraphs and tech-stack block included.
+2. Opens Finder (Explorer on Windows, the file manager on Linux) with the screenshot selected, ready to drag into the post.
+3. Puts the first comment (`Link: …`) on your clipboard.
+
+You drag the image in, click Publish, and paste the comment under the post.
+
+| | macOS | Windows | Linux |
+| --- | --- | --- | --- |
+| Open LinkedIn | `open` | `rundll32` | `xdg-open` |
+| Show the screenshot | Finder, selected | Explorer, selected | its folder |
+| Copy the comment | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` or `xsel` |
+
+Tested on macOS. On Windows and Linux, anything that can't run is printed for you to do by hand. The link that fills in the composer isn't an official LinkedIn API: if it stops working, the preview's copy button still does. With a scheduler connected to Claude (Typefully, for example), the skill publishes through it instead, image included.
+
 ## What it won't do
 
 - Invent features, commands or screenshots. When it can't run something, it says so and asks you for the capture.
 - Put secrets, IDs, personal or client data in the README, the images or the post.
 - Merge the pull request or delete files without asking. Committing the README to a new branch and opening the PR is the one thing it does on its own.
-- Publish a post without your yes for that post. With a scheduler connected to Claude (Typefully, for example) it publishes through it; without one, you copy the text from the preview. It never drives LinkedIn in a browser.
+- Publish a post without your yes for that post, or click Publish for you. It never signs in to LinkedIn or drives its pages.
 
 ## Project structure
 
@@ -81,6 +99,8 @@ skills/post-your-project/
     terminal.mjs         a real command's output drawn as a terminal window
     check-readme.mjs     checks both READMEs before hand-back
     post-preview.mjs     LinkedIn preview page and text review
+    linkedin-share.mjs   opens LinkedIn with the post, shows the image, copies the comment
+    linkedin-text.mjs    bold title and share link, shared by the two above
     leaks.mjs            secret and personal-data patterns
     wording.mjs          promise words and stock phrases
     browser.mjs          shared headless Chrome launcher

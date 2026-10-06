@@ -62,12 +62,30 @@ Abra o Claude Code num projeto, ou em qualquer pasta com uma URL do GitHub, e pe
 
 Para o post do LinkedIn, na primeira vez a skill pede dois ou três posts seus e guarda em `~/.claude/post-your-project/voice.md`, fora do plugin, então os seus posts nunca são compartilhados junto com ele.
 
+## Como a publicação funciona
+
+Nada é postado sem o seu "sim" para aquele post. Quando você diz sim, e não há agendador conectado, a skill:
+
+1. Abre o LinkedIn no seu navegador com o post já na caixa de publicação — título em negrito, parágrafos e bloco de stack incluídos.
+2. Abre o Finder (o Explorer no Windows, o gerenciador de arquivos no Linux) com o print selecionado, pronto para arrastar para o post.
+3. Deixa o primeiro comentário (`Link: …`) copiado na área de transferência.
+
+Você arrasta a imagem, clica em Publicar e cola o comentário no post.
+
+| | macOS | Windows | Linux |
+| --- | --- | --- | --- |
+| Abrir o LinkedIn | `open` | `rundll32` | `xdg-open` |
+| Mostrar o print | Finder, selecionado | Explorer, selecionado | a pasta dele |
+| Copiar o comentário | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` ou `xsel` |
+
+Testado no macOS. No Windows e no Linux, o que não puder rodar aparece na tela para você fazer à mão. O link que preenche a caixa do post não é uma API oficial do LinkedIn: se parar de funcionar, o botão de copiar da prévia continua funcionando. Com um agendador conectado ao Claude (a Typefully, por exemplo), a skill publica por ele, já com a imagem.
+
 ## O que ela não faz
 
 - Inventar funcionalidade, comando ou print. Quando não consegue rodar algo, ela avisa e pede o print para você.
 - Colocar segredo, ID, dado pessoal ou de cliente no README, nas imagens ou no post.
 - Fazer merge do PR ou apagar arquivo sem perguntar. Fazer o commit do README numa branch nova e abrir o PR é a única coisa que ela faz por conta própria.
-- Publicar um post sem o seu "sim" para aquele post. Com um agendador conectado ao Claude (a Typefully, por exemplo), ela publica por ele; sem isso, você copia o texto da prévia. Ela nunca controla o LinkedIn pelo navegador.
+- Publicar um post sem o seu "sim" para aquele post, ou clicar em Publicar por você. Ela nunca entra no LinkedIn nem controla as páginas dele.
 
 ## Estrutura do projeto
 
@@ -81,6 +99,8 @@ skills/post-your-project/
     terminal.mjs         a saída de um comando real desenhada como terminal
     check-readme.mjs     confere os dois READMEs antes da entrega
     post-preview.mjs     página de prévia do LinkedIn e revisão do texto
+    linkedin-share.mjs   abre o LinkedIn com o post, mostra a imagem, copia o comentário
+    linkedin-text.mjs    título em negrito e link de compartilhamento, usados pelos dois acima
     leaks.mjs            padrões de segredo e de dado pessoal
     wording.mjs          palavras de promessa e frases prontas
     browser.mjs          inicialização compartilhada do Chrome headless
