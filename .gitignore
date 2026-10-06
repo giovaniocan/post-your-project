@@ -1,0 +1,3 @@
+# Installed on first use by the skill itself (playwright-core).
+node_modules/
+.DS_Store

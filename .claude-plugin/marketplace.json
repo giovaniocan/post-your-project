@@ -1,0 +1,16 @@
+{
+  "name": "giovaniocan",
+  "owner": {
+    "name": "Giovani Ocan",
+    "url": "https://github.com/giovaniocan"
+  },
+  "description": "Claude Code plugins by Giovani Ocan.",
+  "plugins": [
+    {
+      "name": "post-your-project",
+      "source": "./",
+      "description": "Bilingual README (EN + PT-BR) grounded in the code, real screenshots, and a LinkedIn post draft.",
+      "version": "1.0.0"
+    }
+  ]
+}

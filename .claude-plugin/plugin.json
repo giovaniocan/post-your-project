@@ -1,0 +1,13 @@
+{
+  "name": "post-your-project",
+  "version": "1.0.0",
+  "description": "Present a software project: a bilingual README (English + Brazilian Portuguese) grounded in the code, real screenshots of the running app or its terminal output, and a LinkedIn post draft with a preview to copy from.",
+  "author": {
+    "name": "Giovani Ocan",
+    "url": "https://github.com/giovaniocan"
+  },
+  "homepage": "https://github.com/giovaniocan/post-your-project",
+  "repository": "https://github.com/giovaniocan/post-your-project",
+  "license": "MIT",
+  "keywords": ["readme", "documentation", "screenshots", "portfolio", "linkedin", "bilingual", "pt-br"]
+}
