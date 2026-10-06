@@ -14,8 +14,14 @@
 //   "posts": [ { "lang": "pt-BR", "file": "/abs/post-pt.txt" },  // or "text": "..."
 //              { "lang": "en", "file": "/abs/post-en.txt" } ],
 //   "images": [ { "path": "/abs/docs/screenshots/home.png", "alt": "..." } ],
-//   "firstComment": "Code: https://github.com/..."       // optional
+//   "firstComment": "Code: https://github.com/...",      // optional
+//   "boldTitle": true,       // optional: the first line becomes Unicode bold, accents kept
+//   "limits": { "bodyMin": 900, "bodyMax": 1800, "maxHashtags": 3, "maxEmoji": 2 }  // optional
 // }
+// Each post may also carry "titleOptions": ["...", "..."], listed beside it.
+// Write the title as plain text: the script does the bold conversion, so the
+// review sees real words and the copy gets the bold ones.
+// "Body" means the text before a line starting with 🧰 (the tech-stack block).
 //
 // The page is written for the Artifact tool, which adds the document skeleton;
 // --standalone adds it here, for opening the file straight in a browser.
@@ -43,6 +49,32 @@ const URL_PATTERN = /https?:\/\/[^\s<]+/g;
 const HAS_URL = /https?:\/\//;
 const MARKDOWN = /\*\*[^*\n]+\*\*|__[^_\n]+__|^#{1,6}\s|`[^`\n]+`|\[[^\]\n]+\]\([^)\n]+\)/m;
 const MATH_ALPHANUMERICS = /[\u{1D400}-\u{1D7FF}]/u;
+const STACK_LINE = /^\s*🧰/mu;
+const EMOJI = /\p{Extended_Pictographic}/gu;
+
+// Mathematical Sans-Serif Bold: the "bold" LinkedIn readers see. Accented
+// letters have no bold form, so they are split (NFD), the base letter is
+// converted and the accent is put back on it.
+function toUnicodeBold(text) {
+  const bold = [...text.normalize('NFD')].map((character) => {
+    const code = character.codePointAt(0);
+    if (character >= 'A' && character <= 'Z') return String.fromCodePoint(0x1d5d4 + code - 65);
+    if (character >= 'a' && character <= 'z') return String.fromCodePoint(0x1d5ee + code - 97);
+    if (character >= '0' && character <= '9') return String.fromCodePoint(0x1d7ec + code - 48);
+    return character;
+  });
+  return bold.join('').normalize('NFC');
+}
+
+function withBoldTitle(text) {
+  const [title, ...rest] = text.split('\n');
+  return [toUnicodeBold(title), ...rest].join('\n');
+}
+
+function bodyOf(text) {
+  const match = text.match(STACK_LINE);
+  return match ? text.slice(0, match.index).trimEnd() : text;
+}
 
 function fail(message) {
   console.error(`${PREFIX}: ${message}`);
@@ -63,7 +95,8 @@ function loadPosts(config, baseDir) {
     if (!post.lang) fail(`posts[${index}].lang is required (e.g. "pt-BR" or "en")`);
     const text = post.text ?? (post.file ? readFileSync(path.resolve(baseDir, post.file), 'utf8') : null);
     if (!text || text.trim() === '') fail(`posts[${index}] has no text`);
-    return { lang: post.lang, text: text.replace(/\r\n/g, '\n').trim() };
+    const titleOptions = Array.isArray(post.titleOptions) ? post.titleOptions.map(String) : [];
+    return { lang: post.lang, text: text.replace(/\r\n/g, '\n').trim(), titleOptions };
   });
 }
 
@@ -112,16 +145,32 @@ function foldIndex(text) {
   return space > FOLD_CHARACTERS / 2 ? space : index;
 }
 
-function lint(post) {
+function lint(post, { limits, boldTitle }) {
   const notes = [];
   const length = characterCount(post.text);
+  const bodyLength = characterCount(bodyOf(post.text));
   // In Portuguese: the same notes show on the preview page, which the user reads.
   if (length > CHARACTER_LIMIT) notes.push(`${length} caracteres — o LinkedIn corta o post em ${CHARACTER_LIMIT}`);
-  else if (length > LONG_POST) notes.push(`${length} caracteres é longo para post de projeto; os bons costumam ficar entre 700 e 1.300`);
+  if (limits.bodyMax && bodyLength > limits.bodyMax) {
+    notes.push(`corpo com ${bodyLength} caracteres sem a stack — o combinado é no máximo ${limits.bodyMax}`);
+  } else if (limits.bodyMin && bodyLength < limits.bodyMin) {
+    notes.push(`corpo com ${bodyLength} caracteres sem a stack — o combinado é no mínimo ${limits.bodyMin}`);
+  } else if (!limits.bodyMax && length > LONG_POST && length <= CHARACTER_LIMIT) {
+    notes.push(`${length} caracteres é longo para post de projeto; os bons costumam ficar entre 700 e 1.300`);
+  }
   if (MARKDOWN.test(post.text)) notes.push('tem markdown (**negrito**, # título, `código` ou [link](url)) — o LinkedIn mostra os símbolos como estão');
-  if (MATH_ALPHANUMERICS.test(post.text)) notes.push('letras "negrito" ou "itálico" em Unicode — leitor de tela e busca não conseguem ler');
+  if (MATH_ALPHANUMERICS.test(post.text)) {
+    notes.push(boldTitle
+      ? 'letras em negrito Unicode no texto — escreva tudo em texto normal; o script converte o título'
+      : 'letras "negrito" ou "itálico" em Unicode — leitor de tela e busca não conseguem ler');
+  }
+  const maxHashtags = limits.maxHashtags ?? MAX_HASHTAGS;
   const hashtags = matchesOf(post.text, HASHTAG);
-  if (hashtags.length > MAX_HASHTAGS) notes.push(`${hashtags.length} hashtags — use no máximo ${MAX_HASHTAGS}`);
+  if (hashtags.length > maxHashtags) notes.push(`${hashtags.length} hashtags — use no máximo ${maxHashtags}`);
+  if (limits.maxEmoji !== undefined) {
+    const emoji = matchesOf(bodyOf(post.text), EMOJI).length;
+    if (emoji > limits.maxEmoji) notes.push(`${emoji} emojis no corpo — o combinado é no máximo ${limits.maxEmoji}`);
+  }
   for (const cliche of new Set(matchesOf(post.text, CLICHES))) notes.push(`frase pronta "${cliche}" — diga a coisa concreta no lugar`);
   for (const word of new Set(matchesOf(post.text, PROMISE_WORDS))) notes.push(`"${word}" — sustente com o README ou tire`);
   if (HAS_URL.test(post.text)) notes.push('link no corpo do post — posts com link externo costumam alcançar menos gente; o lugar de costume é o primeiro comentário');
@@ -153,7 +202,15 @@ function panelHtml(post, index, context) {
   const before = post.text.slice(0, fold);
   const after = post.text.slice(fold);
   const length = characterCount(post.text);
+  const bodyLength = characterCount(bodyOf(post.text));
   const hashtags = matchesOf(post.text, HASHTAG).length;
+  const emoji = matchesOf(bodyOf(post.text), EMOJI).length;
+  const titleOptions = post.titleOptions.length
+    ? `<div class="review">
+          <h2>Outras opções de título</h2>
+          <ul class="options">${post.titleOptions.map((title) => `<li>${escapeHtml(title)}</li>`).join('')}</ul>
+        </div>`
+    : '';
   const notes = post.notes.length
     ? `<ul class="notes">${post.notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul>`
     : '<p class="clean">Nenhum alerta na revisão automática.</p>';
@@ -178,14 +235,17 @@ function panelHtml(post, index, context) {
         <button type="button" class="copy primary" data-copy="post-${index}" id="copy-post-${index}">Copiar texto</button>
         <dl class="stats">
           <div><dt>Caracteres</dt><dd><span class="${length > CHARACTER_LIMIT ? 'over' : ''}">${formatNumber(length)}</span> / ${formatNumber(CHARACTER_LIMIT)}</dd></div>
+          <div><dt>Corpo sem a stack</dt><dd>${formatNumber(bodyLength)}</dd></div>
           <div><dt>Antes do “ver mais”</dt><dd>${formatNumber(characterCount(before))}</dd></div>
           <div><dt>Hashtags</dt><dd>${hashtags}</dd></div>
+          <div><dt>Emojis no corpo</dt><dd>${emoji}</dd></div>
           <div><dt>Imagens</dt><dd>${context.images.length}</dd></div>
         </dl>
         <div class="review">
           <h2>Revisão automática</h2>
           ${notes}
         </div>
+        ${titleOptions}
       </aside>
     </div>
   </section>`;
@@ -276,6 +336,7 @@ function pageHtml(context) {
   .review { display: grid; gap: 8px; }
   .notes { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--warn); font-size: 14px; }
   .clean { margin: 0; color: var(--ok); font-size: 14px; }
+  .options { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
   button.copy { font: 500 14px var(--ui); border-radius: 6px; padding: 10px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--fg); justify-self: start; }
   button.copy.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); justify-self: stretch; }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -363,12 +424,20 @@ function main() {
   const config = readJson(configFile);
   if (!config.project) fail('config.project is required');
   const baseDir = path.dirname(path.resolve(configFile));
-  const posts = loadPosts(config, baseDir).map((post) => ({ ...post, notes: lint(post) }));
+  const options = { limits: config.limits ?? {}, boldTitle: Boolean(config.boldTitle) };
+  // Checks run on the plain text: a key in bold Unicode letters would slip past
+  // every pattern. The bold version is what the page shows and the copy takes.
+  const posts = loadPosts(config, baseDir).map((post) => ({
+    ...post,
+    plain: post.text,
+    text: options.boldTitle ? withBoldTitle(post.text) : post.text,
+    notes: lint(post, options),
+  }));
 
   // A secret stops the build instead of becoming a note: the preview page
   // would carry it, and the next step is the user pasting the text in public.
   const secrets = [
-    ...posts.flatMap((post) => findLeaks(post.text).map((leak) => ({ ...leak, where: post.lang }))),
+    ...posts.flatMap((post) => findLeaks(post.plain).map((leak) => ({ ...leak, where: post.lang }))),
     ...findLeaks(config.firstComment ?? '').map((leak) => ({ ...leak, where: 'first comment' })),
   ].filter(({ secret }) => secret);
   if (secrets.length > 0) {

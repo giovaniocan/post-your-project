@@ -8,6 +8,8 @@ const PROMISE_TERMS = [
   'powerful', 'ideal', 'best', 'secure', 'revolutionary', 'cutting-edge', 'state-of-the-art',
   'produção', 'escal(?:a|ável|abilidade)', 'milhares', 'milhões', 'tempo real', 'complet[oa]',
   'robust[oa]', 'poderos[oa]', 'segur[oa]', 'revolucionári[oa]',
+  // Usually false in the absolute: a free tier is still a cost ceiling.
+  'zero custo', 'custo zero', 'zero cost',
 ];
 
 export const PROMISE_WORDS = new RegExp(`\\b(${PROMISE_TERMS.join('|')})\\b`, 'giu');
@@ -24,6 +26,10 @@ const CLICHE_TERMS = [
   'mudou o jogo',
   'comente ["“]?eu quero',
   'bora(?: lá)?[!.]',
+  'mergulh(?:ar|ei|amos|ando)',
+  'jornada',
+  'não é só [^.\\n]{1,60}, é',
+  "it'?s not just [^.\\n]{1,60}, it'?s",
   "(?:i'm|i am) (?:so )?(?:thrilled|excited|happy|proud) to (?:share|announce)",
   'excited to share',
   'game[- ]changer',

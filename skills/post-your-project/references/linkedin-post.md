@@ -49,7 +49,9 @@ interesting, and click through if they want more.
 
 - Plain text, blank line between paragraphs. LinkedIn shows `**asterisks**`
   and `#` headings as they are.
-- No Unicode "bold" letters: screen readers and search can't read them.
+- No Unicode "bold" letters: screen readers and search can't read them. If
+  the author's voice asks for a bold title anyway, keep it to the title, write
+  it in plain text and set `boldTitle` — the preview script converts it.
 - Emoji only as the author's samples use them.
 - The repo link goes in the first comment, and the post says it is there.
 

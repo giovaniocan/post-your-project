@@ -425,7 +425,9 @@ line as the README: nothing the code doesn't back.
 
 1. **Facts.** Reuse the fact sheet if you wrote the README in this session.
    Otherwise build it as in step 2; an existing README is a source, not proof,
-   so check its claims against the code like any other.
+   so check its claims against the code like any other. Ask the author at most
+   two questions, and only what the code and README can't answer: is there a
+   real result number, and is the project live and in use?
 2. **Ask which language**, every time: Portuguese, English, or both. Both means
    two separate texts, each written natively — not one post in two languages,
    and not a translation of the other.
@@ -434,14 +436,18 @@ line as the README: nothing the code doesn't back.
    it. If that file doesn't exist, ask the user for two or three of their own
    posts and, with their OK, save them there as written. Then read
    `references/linkedin-post.md` for the writing rules. Where the voice and the
-   rules differ, the voice wins; grounding never bends.
+   rules differ, the voice wins — its structure, title formulas, limits and
+   output order included; grounding never bends. Numbers in the voice's
+   example posts belong to those posts: never carry one into a new post.
 4. **Pick the images**: one to three from `docs/screenshots/`, hero first. If
    the project has none yet, capture them as in step 3.
 5. **Write** each text to its own file in the scratchpad, and a first comment
    with the repo link (the text says where the link is).
 6. **Build the preview**: write a `post.json` next to the texts (format at the
-   top of the script; `author` is the user's name from `git config user.name`)
-   and run `node <skill-dir>/scripts/post-preview.mjs post.json preview.html`.
+   top of the script; `author` is the user's name from `git config user.name`;
+   `boldTitle`, `limits` and each post's `titleOptions` when the voice asks for
+   them — write the title in plain text, the script makes it bold) and run
+   `node <skill-dir>/scripts/post-preview.mjs post.json preview.html`.
    It prints review notes — stock phrases, markdown, promise words, length,
    hashtags, a link in the body, personal data. Fix each one, or keep it only
    when you can say why (a "complete history" that is literally the complete
@@ -453,5 +459,6 @@ line as the README: nothing the code doesn't back.
    Without the Artifact tool, rebuild with `--standalone` and open the file
    locally.
 8. **Hand back** the preview link, which language(s), what the review flagged
-   and what you did about it. Never post to LinkedIn, and don't offer to: the
+   and what you did about it — in the order and with the extras the voice asks
+   for, when it does (title options, first comment, media, points to confirm). Never post to LinkedIn, and don't offer to: the
    user copies the text and posts it themselves.
