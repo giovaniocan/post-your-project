@@ -1,21 +1,23 @@
 #!/usr/bin/env node
-// Gets a LinkedIn post ready to publish for someone with no scheduler
-// connected: the composer opens with the text filled in, the file manager
-// shows the image to drag into it, and the first comment waits on the
-// clipboard. The person still clicks Publish; nothing here touches their
-// account.
+// Gets a LinkedIn post ready to publish for someone without the automatic
+// mode: the composer opens with the text filled in, and the post's images
+// wait in a folder whose path is on the clipboard. The person attaches them
+// through LinkedIn's Media button and clicks Publish; nothing here touches
+// their account.
 //
 // Usage: node linkedin-share.mjs <post.json> [--lang pt-BR] [--dry-run]
 //
-// Reads the same post.json as post-preview.mjs. The share link carries text
-// only, and pasting an image into the composer didn't work in testing — hence
-// the file manager. --dry-run prints the plan without opening anything.
+// Reads the same post.json as post-preview.mjs. Why the folder path: in
+// testing, LinkedIn's composer took images only through the Media button —
+// pasting an image and dragging one both failed. With the folder path on the
+// clipboard, the file window jumps straight to it and select-all picks every
+// image, in the preview's order, however many there are.
 //
 // Tested on macOS. Windows and Linux use each system's documented commands;
 // whatever can't run is printed for the person to do by hand.
 
 import { spawnSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { findLeaks } from './leaks.mjs';
@@ -24,6 +26,7 @@ import { shareUrl, withBoldTitle } from './linkedin-text.mjs';
 const PREFIX = 'linkedin-share';
 // Browsers take far longer URLs, but past this LinkedIn may cut the text.
 const URL_WARNING_LENGTH = 8000;
+const HAS_URL = /https?:\/\//;
 
 function fail(message) {
   console.error(`${PREFIX}: ${message}`);
@@ -70,54 +73,81 @@ function loadPost(options) {
   if (missing) fail(`image not found: ${missing}`);
 
   return {
+    project: String(config.project ?? 'post'),
     text: config.boldTitle ? withBoldTitle(plain) : plain,
     images,
     comment,
   };
 }
 
-// With one image the file manager highlights it. With several, numbered
-// copies in a fresh folder keep the order the preview shows.
-function imageTarget(images) {
-  if (images.length <= 1) return { file: images[0] ?? null, folder: null };
-  const folder = mkdtempSync(path.join(os.tmpdir(), 'linkedin-post-'));
+const LEFT_BY_AN_EARLIER_RUN = /^\d+-.+\.(?:png|jpe?g|gif|webp)$/i;
+
+// Downloads/linkedin-posts/<project>: easy to find by hand, one folder per
+// project, and stable — the browser's file window reopens where it was last
+// used, so posting the same project again lands right in it.
+function imageFolder(images, project) {
+  const downloads = path.join(os.homedir(), 'Downloads');
+  const safeName = project.replace(/[^\p{L}\p{N}._-]+/gu, '-').replace(/^-+|-+$/g, '') || 'post';
+  const folder = path.join(existsSync(downloads) ? downloads : os.tmpdir(), 'linkedin-posts', safeName);
+  mkdirSync(folder, { recursive: true });
+  // Clears only the numbered images an earlier run of this project copied
+  // here; anything else in the folder stays.
+  readdirSync(folder)
+    .filter((name) => LEFT_BY_AN_EARLIER_RUN.test(name))
+    .forEach((name) => rmSync(path.join(folder, name)));
+  // Numbered so select-all keeps the preview's order.
   images.forEach((image, index) => copyFileSync(image, path.join(folder, `${index + 1}-${path.basename(image)}`)));
-  return { file: null, folder };
+  return folder;
 }
 
-function commandsFor(platform, url, target) {
-  const reveal = target.file ?? target.folder;
-  if (platform === 'darwin') {
-    return {
-      open: [['open', [url]]],
-      reveal: reveal ? [['open', target.file ? ['-R', target.file] : [target.folder]]] : [],
-      copy: [['pbcopy', []]],
-    };
-  }
+function commandsFor(platform, url) {
+  if (platform === 'darwin') return { open: [['open', [url]]], copy: [['pbcopy', []]] };
   if (platform === 'win32') {
     return {
       // rundll32 hands the URL to the default browser without cmd.exe
       // splitting it at every "&".
       open: [['rundll32', ['url.dll,FileProtocolHandler', url]]],
-      reveal: reveal ? [['explorer', [target.file ? `/select,${target.file}` : target.folder]]] : [],
       copy: [['powershell', ['-NoProfile', '-Command', '[Console]::InputEncoding=[Text.Encoding]::UTF8; Set-Clipboard -Value ([Console]::In.ReadToEnd())']]],
     };
   }
   return {
     open: [['xdg-open', [url]]],
-    reveal: reveal ? [['xdg-open', [target.folder ?? path.dirname(target.file)]]] : [],
     // Whichever clipboard tool the desktop has; tried in order.
     copy: [['wl-copy', []], ['xclip', ['-selection', 'clipboard']], ['xsel', ['--clipboard', '--input']]],
   };
 }
 
-// Tries each alternative until one runs. explorer.exe exits with 1 even when
-// it worked, so only a missing program counts as failure there.
+// The file window's own "go to this folder" shortcut, per system.
+const JUMP_TO_FOLDER = {
+  darwin: '⌘⇧G, ⌘V, Enter',
+  win32: 'Ctrl+V into the "File name" box, Enter',
+  linux: 'Ctrl+L, Ctrl+V, Enter',
+};
+const SELECT_ALL = { darwin: '⌘A, Enter', win32: 'click one image, Ctrl+A, Open', linux: 'Ctrl+A, Open' };
+
+function stepsFor(platform, { hasCard, images }) {
+  const system = JUMP_TO_FOLDER[platform] ? platform : 'linux';
+  return [
+    // A link in the text makes LinkedIn add a link-preview card, and a post
+    // holds either that card or images.
+    ...(hasCard ? ['close the link preview card (its X)'] : []),
+    ...(images > 0
+      ? [
+          'click Media (the photo icon)',
+          `in the file window, if it isn't already showing the project's folder: ${JUMP_TO_FOLDER[system]}`,
+          `${SELECT_ALL[system]} — all ${images} image(s), in order`,
+          'confirm the images (Next / Done)',
+        ]
+      : []),
+    'click Publish',
+  ];
+}
+
+// Tries each alternative until one runs.
 function runFirst(alternatives, input) {
   for (const [program, args] of alternatives) {
     const result = spawnSync(program, args, { input, stdio: [input === undefined ? 'ignore' : 'pipe', 'ignore', 'ignore'] });
-    const ran = !result.error && (result.status === 0 || program === 'explorer');
-    if (ran) return program;
+    if (!result.error && result.status === 0) return program;
   }
   return null;
 }
@@ -128,32 +158,30 @@ function main() {
   const url = shareUrl(post.text);
   if (url.length > URL_WARNING_LENGTH) say(`warning: the link is ${url.length} characters; LinkedIn may cut the end of the text`);
 
-  const target = options.dryRun ? { file: post.images[0] ?? null, folder: null } : imageTarget(post.images);
-  const commands = commandsFor(process.platform, url, target);
+  const commands = commandsFor(process.platform, url);
+  const steps = stepsFor(process.platform, { hasCard: HAS_URL.test(post.text), images: post.images.length });
 
   if (options.dryRun) {
-    say(`dry run on ${process.platform}: ${[...post.text].length} characters, link ${url.length} characters`);
-    say(`would open: ${commands.open.map(([program]) => program).join(' or ')}`);
-    say(`would reveal: ${target.file ?? 'no image'} (${post.images.length} image(s))`);
-    say(post.comment
-      ? `would copy the first comment with: ${commands.copy.map(([program]) => program).join(' or ')}`
-      : 'no first comment — the link is in the body, nothing to copy');
+    say(`dry run on ${process.platform}: ${[...post.text].length} characters, link ${url.length} characters, ${post.images.length} image(s)`);
+    say(`would open the composer with: ${commands.open.map(([program]) => program).join(' or ')}`);
+    if (post.images.length > 0) say(`would put the image folder's path on the clipboard with: ${commands.copy.map(([program]) => program).join(' or ')}`);
+    steps.forEach((step, index) => say(`step ${index + 1}: ${step}`));
     return;
   }
 
   const opened = runFirst(commands.open);
   say(opened ? 'LinkedIn opened with the post filled in' : `open this link by hand: ${url}`);
 
-  if (commands.reveal.length > 0) {
-    const revealed = runFirst(commands.reveal);
-    const where = target.file ?? target.folder;
-    say(revealed ? `showing ${where} — drag it into the post` : `attach this image by hand: ${where}`);
+  if (post.images.length > 0) {
+    const folder = imageFolder(post.images, post.project);
+    const copied = runFirst(commands.copy, folder);
+    say(copied ? `image folder's path copied: ${folder}` : `image folder (copy its path by hand): ${folder}`);
   }
 
-  if (post.comment) {
-    const copied = runFirst(commands.copy, post.comment);
-    say(copied ? 'first comment copied — paste it under the post once it is published' : `first comment to paste by hand: ${post.comment}`);
-  }
+  steps.forEach((step, index) => say(`step ${index + 1}: ${step}`));
+  // The clipboard holds the folder path while the post is put together, so a
+  // first comment can only be handed over as text.
+  if (post.comment) say(`after publishing, comment: ${post.comment}`);
 }
 
 main();

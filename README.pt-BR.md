@@ -64,20 +64,15 @@ Para o post do LinkedIn, na primeira vez a skill pede dois ou três posts seus e
 
 ## Como a publicação funciona
 
-Nada é postado sem o seu "sim" para aquele post. Quando você diz sim, e não há agendador conectado, a skill:
+Nada é postado sem o seu "sim" para aquele post. Depois do sim, a skill abre o LinkedIn no seu navegador com o post já na caixa de publicação — título em negrito, parágrafos, a linha `Link: …` e o bloco de stack — e copia os prints do post, numerados na ordem, para `Downloads/linkedin-posts/<projeto>/`, deixando o caminho dessa pasta na área de transferência. Você:
 
-1. Abre o LinkedIn no seu navegador com o post já na caixa de publicação — título em negrito, parágrafos, a linha `Link: …` para o repositório e o bloco de stack incluídos.
-2. Abre o Finder (o Explorer no Windows, o gerenciador de arquivos no Linux) com o print selecionado, pronto para arrastar para o post.
+1. Fecha o cartão do link (o X).
+2. Clica em Mídia. Se a janela de arquivos ainda não estiver na pasta do projeto, aperta ⌘⇧G, ⌘V, Enter.
+3. Aperta ⌘A, Enter e clica em Publicar.
 
-Você arrasta a imagem e clica em Publicar. O link vai no próprio post, então não há comentário para colar; se a sua voz pedir o link num primeiro comentário, a skill também deixa esse comentário copiado.
+A caixa de post do LinkedIn só aceita imagem pelo botão Mídia — colar ou arrastar não funciona. A janela de arquivos do navegador reabre onde foi usada pela última vez, então no próximo post do mesmo projeto o ⌘⇧G costuma nem ser preciso. No Windows a janela vai para a pasta com Ctrl+V no campo do nome do arquivo; no Linux, com Ctrl+L, Ctrl+V. Testado no macOS. O link que preenche a caixa do post não é uma API oficial do LinkedIn: se parar de funcionar, o botão de copiar da prévia continua funcionando.
 
-| | macOS | Windows | Linux |
-| --- | --- | --- | --- |
-| Abrir o LinkedIn | `open` | `rundll32` | `xdg-open` |
-| Mostrar o print | Finder, selecionado | Explorer, selecionado | a pasta dele |
-| Copiar um primeiro comentário, se houver | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` ou `xsel` |
-
-Testado no macOS. No Windows e no Linux, o que não puder rodar aparece na tela para você fazer à mão. O link que preenche a caixa do post não é uma API oficial do LinkedIn: se parar de funcionar, o botão de copiar da prévia continua funcionando. Com um agendador conectado ao Claude (a Typefully, por exemplo), a skill publica por ele, já com a imagem.
+Um agendador conectado ao Claude (a Typefully, por exemplo) também serve: a skill publica por ele.
 
 ## O que ela não faz
 
@@ -98,7 +93,7 @@ skills/post-your-project/
     terminal.mjs         a saída de um comando real desenhada como terminal
     check-readme.mjs     confere os dois READMEs antes da entrega
     post-preview.mjs     página de prévia do LinkedIn e revisão do texto
-    linkedin-share.mjs   abre o LinkedIn com o post, mostra a imagem, copia o comentário
+    linkedin-share.mjs   abre o LinkedIn com o post e os prints prontos para anexar
     linkedin-text.mjs    título em negrito e link de compartilhamento, usados pelos dois acima
     leaks.mjs            padrões de segredo e de dado pessoal
     wording.mjs          palavras de promessa e frases prontas

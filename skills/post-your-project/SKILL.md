@@ -488,23 +488,22 @@ line as the README: nothing the code doesn't back.
    images the preview shows; change anything afterwards and ask again. A post
    is public the moment it goes out, and deleting it later doesn't reach the
    people who already saw it.
-   - If a social-media scheduler with LinkedIn is connected to this session —
-     Typefully's connector is one: upload each image with its media upload,
-     then create the post for the LinkedIn account with `publish_at: "now"` —
-     use it. First check that the LinkedIn account it lists is the user's.
-   - Publish exactly what the preview shows, bold title included, images in
-     the preview's order.
-   - Then give the user the link the tool returns. If the post has a first
-     comment the tool can't add, hand the user its text to paste under it.
-   - With no such connector — the usual case — run
-     `node <skill-dir>/scripts/linkedin-share.mjs post.json` (add
-     `--lang <lang>` when there are two posts). It opens LinkedIn's composer
-     with the text filled in, shows the screenshot in Finder (Explorer, or the
-     file manager on Linux) to drag into the post, and — only when the post
-     has a first comment — puts it on the clipboard. Tell the user what is
-     left to them: drag the image in and click Publish (and paste the comment,
-     when there is one). The script
-     prints whatever it couldn't do on this system; pass that on. Pasting an
-     image into the composer doesn't work, so don't suggest it.
+   Publish exactly what the preview shows, bold title included, images in the
+   preview's order, choosing the first of these that is available (add
+   `--lang <lang>` to the scripts when there are two posts):
+   - **A scheduler connected to this session** with LinkedIn (Typefully's
+     connector is one: upload each image with its media upload, then create
+     the post for the LinkedIn account with `publish_at: "now"`). First check
+     that the account it lists is the user's.
+   - **Otherwise** run `node <skill-dir>/scripts/linkedin-share.mjs post.json`.
+     It opens LinkedIn's composer with the text filled in, copies the images,
+     numbered, into `Downloads/linkedin-posts/<project>/` and puts that
+     folder's path on the clipboard, and
+     prints the steps left to the user: close the link card (X), Media, jump
+     to the folder (⌘⇧G ⌘V Enter on macOS), select all, Publish. Pass the
+     steps on as it prints them. Pasting or dragging an image into the
+     composer doesn't work, so don't suggest either.
+   - Give the user the post's link when the tool returns one. If the post has
+     a first comment the tool can't add, hand over its text to paste under it.
    - Never sign in to LinkedIn in a browser or drive its pages: LinkedIn's
      terms forbid automated posting, and the account is what gets restricted.

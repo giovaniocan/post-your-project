@@ -64,20 +64,15 @@ For the LinkedIn post, the skill asks for two or three of your own posts the fir
 
 ## How publishing works
 
-Nothing is posted without your yes for that specific post. When you say yes, and no scheduler is connected, the skill:
+Nothing is posted without your yes for that specific post. Then the skill opens LinkedIn in your browser with the post already in the composer — bold title, paragraphs, the `Link: …` line and the tech-stack block — and copies the post's screenshots, numbered in order, into `Downloads/linkedin-posts/<project>/`, with that folder's path on your clipboard. You:
 
-1. Opens LinkedIn in your browser with the post already in the composer — bold title, paragraphs, the `Link: …` line to the repo and the tech-stack block included.
-2. Opens Finder (Explorer on Windows, the file manager on Linux) with the screenshot selected, ready to drag into the post.
+1. Close the link card (its X).
+2. Click Media. If the file window isn't already in the project's folder, press ⌘⇧G, ⌘V, Enter.
+3. Press ⌘A, Enter, then click Publish.
 
-You drag the image in and click Publish. The link goes in the post itself, so there's no comment to paste; if your voice asks for it in a first comment instead, the skill also puts that comment on your clipboard.
+LinkedIn's composer takes images only through the Media button — pasting or dragging one doesn't work. The browser's file window reopens where it was last used, so posting the same project again usually skips the ⌘⇧G step. On Windows the file window jumps to the folder with Ctrl+V in the file-name box; on Linux with Ctrl+L, Ctrl+V. Tested on macOS. The link that fills in the composer isn't an official LinkedIn API: if it stops working, the preview's copy button still does.
 
-| | macOS | Windows | Linux |
-| --- | --- | --- | --- |
-| Open LinkedIn | `open` | `rundll32` | `xdg-open` |
-| Show the screenshot | Finder, selected | Explorer, selected | its folder |
-| Copy a first comment, if any | `pbcopy` | PowerShell `Set-Clipboard` | `wl-copy`, `xclip` or `xsel` |
-
-Tested on macOS. On Windows and Linux, anything that can't run is printed for you to do by hand. The link that fills in the composer isn't an official LinkedIn API: if it stops working, the preview's copy button still does. With a scheduler connected to Claude (Typefully, for example), the skill publishes through it instead, image included.
+A scheduler connected to Claude (Typefully, for example) also works: the skill publishes through it.
 
 ## What it won't do
 
@@ -98,7 +93,7 @@ skills/post-your-project/
     terminal.mjs         a real command's output drawn as a terminal window
     check-readme.mjs     checks both READMEs before hand-back
     post-preview.mjs     LinkedIn preview page and text review
-    linkedin-share.mjs   opens LinkedIn with the post, shows the image, copies the comment
+    linkedin-share.mjs   opens LinkedIn with the post and the screenshots ready to attach
     linkedin-text.mjs    bold title and share link, shared by the two above
     leaks.mjs            secret and personal-data patterns
     wording.mjs          promise words and stock phrases
